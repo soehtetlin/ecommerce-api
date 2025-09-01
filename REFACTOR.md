@@ -30,24 +30,26 @@ The provided code snippet for the checkout process is functional but contains se
 
 ---
 
+---
+
 ## 2. Rewritten Code
 
 The following rewritten code addresses all the identified issues. It uses `async/await` for readability, a single database query to fetch products, and a database transaction to ensure atomicity.
 
-**Assumption:** Based on a real-world checkout scenario, the input `req.body` is assumed to be an array of objects, each containing a `productId` and a `quantity`, like so: `{ "productItems": [{ "productId": "...", "quantity": 2 }] }`.
+**Adherence to Requirement:** As per the instruction, this solution strictly adheres to the original input, which is an array of product IDs. It assumes a quantity of **1** for each product.
 
 ```javascript
 // This assumes the use of Mongoose with a database that supports transactions (e.g., MongoDB Atlas).
 const mongoose = require('mongoose');
 
 app.post('/orders', async (req, res) => {
-  // Assuming a more realistic input from the request body.
-  const { productItems } = req.body; 
+  // Adhering to the original input: an array of product IDs.
+  const { productIds } = req.body; 
   const userId = req.user.id;
 
   // Input validation
-  if (!Array.isArray(productItems) || productItems.length === 0) {
-    return res.status(400).json({ message: 'Product items must be a non-empty array.' });
+  if (!Array.isArray(productIds) || productIds.length === 0) {
+    return res.status(400).json({ message: 'productIds must be a non-empty array.' });
   }
 
   // Start a database session for the transaction.
@@ -56,36 +58,27 @@ app.post('/orders', async (req, res) => {
 
   try {
     // 1. Fetch all products at once using the $in operator to solve the N+1 problem.
-    const productIds = productItems.map(item => item.productId);
     const productsFromDB = await Product.find({ '_id': { $in: productIds } }).session(session);
 
-    // Create a map for quick lookups.
-    const productMap = new Map(productsFromDB.map(p => [p._id.toString(), p]));
+    // Check if all requested products were found.
+    if (productsFromDB.length !== productIds.length) {
+      // Find which products were not found for a clearer error message.
+      const foundIds = new Set(productsFromDB.map(p => p._id.toString()));
+      const notFoundIds = productIds.filter(id => !foundIds.has(id));
+      throw new Error(`The following products were not found: ${notFoundIds.join(', ')}`);
+    }
 
     let totalPrice = 0;
-    const orderProducts = [];
 
-    // 2. Process products synchronously after fetching: check stock and calculate price.
-    for (const item of productItems) {
-      const product = productMap.get(item.productId);
-
-      if (!product) {
-        // If any product is not found, the entire transaction should fail.
-        throw new Error(`Product with ID ${item.productId} not found.`);
-      }
-      if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product: ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`);
+    // 2. Process products: check stock, calculate price, and decrement stock.
+    for (const product of productsFromDB) {
+      if (product.stock < 1) { // Assuming quantity is 1
+        throw new Error(`Insufficient stock for product: ${product.name}.`);
       }
 
       // 3. Decrement stock and calculate total price.
-      product.stock -= item.quantity;
-      totalPrice += product.price * item.quantity;
-      orderProducts.push({ 
-        productId: product._id, 
-        name: product.name, // Store name and price for historical record
-        price: product.price,
-        quantity: item.quantity 
-      });
+      product.stock -= 1; // Assuming quantity is 1
+      totalPrice += product.price;
     }
     
     // 4. Save all updated product stocks in parallel within the transaction.
@@ -94,8 +87,9 @@ app.post('/orders', async (req, res) => {
     // 5. Create the new order.
     const order = new Order({
       userId: userId,
-      products: orderProducts,
-      totalPrice: totalPrice, // Corrected field name
+      // Store product IDs as per the original "Nasty" snippet's logic
+      products: productsFromDB.map(p => p._id), 
+      total: totalPrice,
       status: 'completed'
     });
     

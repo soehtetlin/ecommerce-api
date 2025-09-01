@@ -4,6 +4,8 @@ const express = require('express');
 const connectDB = require('./config/db'); // Import DB connection function
 const productRoutes = require('./routes/productRoutes'); // Import product routes
 const orderRoutes = require('./routes/orderRoutes');   // Import order routes
+const authRoutes = require('./routes/authRoutes'); // Import authentication routes
+const variantRoutes = require('./routes/variantRoutes'); // Import variant routes
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +23,9 @@ app.get('/', (req, res) => {
 
 // Use API Routes
 app.use('/api/products', productRoutes); // All /api/products requests go to productRoutes
-app.use('/api/orders', orderRoutes);     // All /api/orders requests go to orderRoutes
+app.use('/api/orders', orderRoutes); // All /api/orders requests go to orderRoutes
+app.use('/api/auth', authRoutes); // All /api/auth requests go to authRoutes
+app.use('/api', variantRoutes);// All /api requests go to variantRoutes
 
 // Start the server
 app.listen(PORT, () => {

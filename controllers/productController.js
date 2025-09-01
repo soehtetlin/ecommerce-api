@@ -41,20 +41,20 @@ exports.getProductById = async (req, res) => {
 // @access  Private (should be restricted to admins in a real app)
 exports.createProduct = async (req, res) => {
   // Destructure name, price, and stock from the request body
-  const { name, price, stock } = req.body;
+  const { name, description, category } = req.body;
 
   // Basic validation to ensure all fields are present
   // Checking for null allows price or stock to be 0, which is a valid value
-  if (!name || price == null || stock == null) {
-    return res.status(400).json({ message: 'Please enter all fields: name, price, and stock' });
+  if (!name || !description || !category)  {
+    return res.status(400).json({ message: 'Please provide all required fields: name, description, and category'  });
   }
 
   try {
     // Create a new instance of the Product model
     const newProduct = new Product({
       name,
-      price,
-      stock
+      description,
+      category
     });
 
     // Save the new product to the database
@@ -75,14 +75,18 @@ exports.createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private
 exports.updateProduct = async (req, res) => {
+  const { name, description, category } = req.body;
+
   try {
-    // Find a product by its ID and update it with the data from the request body
+    // Create an object with the fields to be updated
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (description) updateFields.description = description;
+    if (category) updateFields.category = category;
+
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id, // The ID of the product to update
-      req.body,      // The new data to update with
-      // Options:
-      // new: true -> returns the modified document rather than the original
-      // runValidators: true -> runs schema validation rules on the update operation
+      req.params.id,
+      updateFields,
       { new: true, runValidators: true }
     );
 
@@ -92,7 +96,6 @@ exports.updateProduct = async (req, res) => {
 
     res.status(200).json(updatedProduct);
   } catch (error) {
-    // Handle validation errors or other update issues
     res.status(400).json({ message: error.message });
   }
 };
