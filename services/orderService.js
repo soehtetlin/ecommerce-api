@@ -99,13 +99,21 @@ class OrderService {
         }
     }
 
-    // You can add other simple pass-through methods here as well
     async getAllOrders() {
         return OrderRepository.findAll();
     }
 
     async getOrderById(orderId) {
         return OrderRepository.findById(orderId);
+    }
+
+    /**
+     * Finds all orders for a specific customer.
+     * @param {string} customerName - The name of the customer.
+     * @returns {Promise<Array<Document>>} A list of orders for the customer.
+     */
+    async getOrdersByCustomerName(customerName) {
+        return OrderRepository.findByCustomerName(customerName);
     }
 }
 

@@ -44,6 +44,24 @@ exports.getOrderById = async (req, res) => {
     }
 };
 
+// @desc    Get all orders for a specific customer
+// @route   GET /api/orders/customer/:customerName
+// @access  Private (Admin)
+exports.getOrdersByCustomer = async (req, res) => {
+    try {
+        // Get the customer name from the URL parameters
+        const customerName = req.params.customerName;
+        
+        // Call the service to fetch the orders
+        const orders = await OrderService.getOrdersByCustomerName(customerName);
+        
+        // Return the orders (will be an empty array if none are found)
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Update the status of an order
 // @route   PUT /api/orders/:id/status
 // @access  Private (Admin)

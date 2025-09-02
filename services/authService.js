@@ -46,7 +46,7 @@ class AuthService {
         const createdUser = await UserRepository.create(newUser);
 
         // 5. Generate and return JWT token
-        return this.generateToken(createdUser.id, createdUser.role);
+        return this.generateToken(createdUser._id, createdUser.role);
     }
 
     /**
@@ -73,7 +73,7 @@ class AuthService {
         }
 
         // 3. Generate and return JWT token
-        return this.generateToken(user.id, user.role);
+        return this.generateToken(user._id, user.role);
     }
     
     /**

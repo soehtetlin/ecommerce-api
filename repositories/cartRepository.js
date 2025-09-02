@@ -14,6 +14,9 @@ class CartRepository {
     async update(cart) {
         return cart.save();
     }
+    async save(cart) {
+        return cart.save();
+    }
 }
 
 module.exports = new CartRepository();
