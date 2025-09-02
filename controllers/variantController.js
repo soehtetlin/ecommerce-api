@@ -1,5 +1,5 @@
-const Variant = require('../models/Variant');
-const Product = require('../models/Product');
+const VariantRepository = require('../repositories/variantRepository');
+const ProductRepository = require('../repositories/productRepository');
 
 // Add a new variant to a product
 exports.addVariant = async (req, res) => {
@@ -7,32 +7,31 @@ exports.addVariant = async (req, res) => {
   const { size, color, price, stock, sku } = req.body;
 
   try {
-    // 1. Find the parent product to ensure it exists
-    const product = await Product.findById(productId);
+    // 1. Find the parent product using the ProductRepository
+    const product = await ProductRepository.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Parent product not found' });
     }
 
-    // 2. Create the new variant instance
-    const newVariant = new Variant({
+    // 2. Create the new variant instance data
+    const newVariantData = {
       product: productId,
       size,
       color,
       price,
       stock,
       sku
-    });
+    };
 
-    // 3. Save the new variant to the database
-    const savedVariant = await newVariant.save();
+    // 3. Save the new variant using the VariantRepository
+    const savedVariant = await VariantRepository.create(newVariantData);
 
-    // 4. Add the new variant's ID to the parent product's 'variants' array
-    product.variants.push(savedVariant._id);
-    await product.save();
+    // 4. Add the new variant's ID to the parent product using the ProductRepository
+    // This logic is now handled by a dedicated repository method for clarity.
+    await ProductRepository.addVariantToProduct(productId, savedVariant._id);
 
     res.status(201).json(savedVariant);
   } catch (error) {
-    // Handle potential duplicate SKU error
     if (error.code === 11000) {
       return res.status(400).json({ message: 'A variant with this SKU already exists.' });
     }
@@ -45,11 +44,8 @@ exports.updateVariant = async (req, res) => {
   const { variantId } = req.params;
   
   try {
-    const updatedVariant = await Variant.findByIdAndUpdate(
-      variantId,
-      req.body, // The request body will contain fields to update, e.g., { "price": 99.99 }
-      { new: true, runValidators: true }
-    );
+    // Use the VariantRepository to update the document
+    const updatedVariant = await VariantRepository.updateById(variantId, req.body);
 
     if (!updatedVariant) {
       return res.status(404).json({ message: 'Variant not found' });
@@ -66,18 +62,16 @@ exports.deleteVariant = async (req, res) => {
     const { variantId } = req.params;
 
     try {
-        // 1. Find and delete the variant
-        const deletedVariant = await Variant.findByIdAndDelete(variantId);
+        // 1. Find and delete the variant using the VariantRepository
+        const deletedVariant = await VariantRepository.deleteById(variantId);
         
         if (!deletedVariant) {
             return res.status(404).json({ message: 'Variant not found' });
         }
 
         // 2. Remove the variant's ID from the parent product's 'variants' array
-        await Product.findByIdAndUpdate(
-            deletedVariant.product,
-            { $pull: { variants: variantId } } // $pull removes an item from an array
-        );
+        // We need a new method in ProductRepository for this. Let's call it removeVariantFromProduct.
+        await ProductRepository.removeVariantFromProduct(deletedVariant.product, variantId);
 
         res.status(200).json({ message: 'Variant deleted successfully' });
     } catch (error) {

@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # The service for our Node.js application
+  app:
+    # Build the image from the Dockerfile in the current directory (.)
+    build: .
+    # Forward port 3000 from the host machine to port 3000 inside the container
+    ports:
+      - "3000:3000"
+    # Use env_file to load variables from the .env file
+    env_file:
+      - .env 
+    # Set the environment variables required by the application
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce_db
+    # Make this service wait for the 'mongo' service to be ready before starting
+    depends_on:
+      - mongo
+    # Set a restart policy
+    restart: unless-stopped
+
+  # The service for our MongoDB database
+  mongo:
+    # Use the latest official MongoDB image from Docker Hub
+    image: mongo:latest
+    # Forward port 27017 for connecting to the DB from our local machine (e.g., with MongoDB Compass)
+    ports:
+      - "27017:27017"
+    # Create a named volume to persist database data even if the container is removed
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+# Define the named volume that 'mongo' service uses for data persistence
+volumes:
+  mongo-data:

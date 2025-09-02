@@ -30,8 +30,6 @@ The provided code snippet for the checkout process is functional but contains se
 
 ---
 
----
-
 ## 2. Rewritten Code
 
 The following rewritten code addresses all the identified issues. It uses `async/await` for readability, a single database query to fetch products, and a database transaction to ensure atomicity.
