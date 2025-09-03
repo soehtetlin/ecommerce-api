@@ -16,6 +16,4 @@ router.get('/', cartController.getCart);
 // @access  Private
 router.post('/', cartController.addItemToCart);
 
-// You can add PUT and DELETE routes here for updating/removing items
-
 module.exports = router;

@@ -27,7 +27,6 @@ exports.addVariant = async (req, res) => {
     const savedVariant = await VariantRepository.create(newVariantData);
 
     // 4. Add the new variant's ID to the parent product using the ProductRepository
-    // This logic is now handled by a dedicated repository method for clarity.
     await ProductRepository.addVariantToProduct(productId, savedVariant._id);
 
     res.status(201).json(savedVariant);
@@ -70,7 +69,6 @@ exports.deleteVariant = async (req, res) => {
         }
 
         // 2. Remove the variant's ID from the parent product's 'variants' array
-        // We need a new method in ProductRepository for this. Let's call it removeVariantFromProduct.
         await ProductRepository.removeVariantFromProduct(deletedVariant.product, variantId);
 
         res.status(200).json({ message: 'Variant deleted successfully' });

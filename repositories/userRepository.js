@@ -11,5 +11,4 @@ class UserRepository {
   }
 }
 
-// Export a single instance of the repository
 module.exports = new UserRepository();

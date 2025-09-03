@@ -29,7 +29,6 @@ class ProductService {
         const newVariantData = { ...variantData, product: productId };
         const savedVariant = await VariantRepository.create(newVariantData);
 
-        // This is a business rule: a new variant must be linked to its parent.
         await ProductRepository.addVariantToProduct(productId, savedVariant._id);
         
         return savedVariant;
@@ -47,8 +46,6 @@ class ProductService {
         if (queryParams.category) {
             filters.category = queryParams.category;
         }
-        // Future filters can be added here (e.g., price range, name search)
-
         // 2. Prepare Sorting options
         const sorting = {};
         if (queryParams.sortBy) {

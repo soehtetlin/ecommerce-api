@@ -28,7 +28,7 @@ class OrderRepository {
   async findById(id) {
     return Order.findById(id);
   }
-  
+
   /**
    * Finds an order by its ID within a transaction session.
    * @param {string} id - The ID of the order.
@@ -47,10 +47,6 @@ class OrderRepository {
   async findByCustomerName(customerName) {
     return Order.find({ customer_name: customerName }).sort({ createdAt: -1 });
   }
-
-  // Note: updateOrderStatus involves complex logic with multiple models,
-  // so it's better to keep that logic in a Service layer. For now,
-  // the individual DB operations will be in their respective repositories.
 }
 
 module.exports = new OrderRepository();

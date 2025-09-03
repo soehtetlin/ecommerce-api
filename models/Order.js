@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({
-    variantId: { // Ensure this is variantId
+    variantId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Variant', // Ensure this refers to 'Variant'
+        ref: 'Variant',
         required: true
     },
     name: { // Stores a snapshot of the name (e.g., SKU)
@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    customer_name: { // You can keep this for display purposes
+    customer_name: {
         type: String,
         required: true,
         trim: true
@@ -46,9 +46,8 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     }
 }, {
-    timestamps: true 
+    timestamps: true
 });
 
-// We removed the pre-save hook for total_price because it's calculated in the service layer now.
 
 module.exports = mongoose.model('Order', orderSchema);

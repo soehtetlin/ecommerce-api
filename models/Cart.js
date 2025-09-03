@@ -1,26 +1,24 @@
 const mongoose = require('mongoose');
 
 const CartItemSchema = new mongoose.Schema({
-    variant: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Variant', 
-        required: true 
+    variant: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Variant',
+        required: true
     },
-    quantity: { 
-        type: Number, 
-        required: true, 
+    quantity: {
+        type: Number,
+        required: true,
         min: 1,
         default: 1
     },
-    // We can store price here, but it's better to calculate it dynamically
-    // by populating the variant to always get the latest price.
 }, { _id: false }); // It's a sub-document, so no separate ID needed
 
 const CartSchema = new mongoose.Schema({
-    user: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true, 
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
         unique: true // Each user has only one cart
     },
     items: [CartItemSchema],

@@ -1,4 +1,3 @@
-// services/orderService.js
 const mongoose = require('mongoose');
 const OrderRepository = require('../repositories/orderRepository');
 const VariantRepository = require('../repositories/variantRepository');

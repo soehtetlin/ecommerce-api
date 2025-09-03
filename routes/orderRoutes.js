@@ -1,4 +1,3 @@
-// routes/orderRoutes.js
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
@@ -19,7 +18,7 @@ router.post('/', protect, orderController.placeOrder);
 // @desc    Get all orders for the logged-in user
 // @access  Private (Requires login)
 // NOTE: This route must be placed BEFORE '/:id' to work correctly.
-router.get('/my-orders', protect, orderController.getMyOrders); // We will need to create getMyOrders controller
+router.get('/my-orders', protect, orderController.getMyOrders);
 
 // @route   GET /api/orders/:id
 // @desc    Get a single order by its ID

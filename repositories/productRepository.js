@@ -1,4 +1,3 @@
-// repositories/productRepository.js
 const Product = require('../models/Product');
 
 class ProductRepository {
@@ -30,7 +29,6 @@ class ProductRepository {
         }
 
         // Populate the 'variants' field for each product
-        // This will replace the variant IDs with the actual variant documents
         return query.populate('variants').exec();
     }
     

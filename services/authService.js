@@ -75,7 +75,7 @@ class AuthService {
         // 3. Generate and return JWT token
         return this.generateToken(user._id, user.role);
     }
-    
+
     /**
      * A helper function to generate a JWT token.
      * @param {string} userId - The user's ID.
