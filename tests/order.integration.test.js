@@ -14,14 +14,14 @@ process.env.NODE_ENV = 'test';
 describe('Order API Endpoints', () => {
     let adminToken, customerToken, testVariantId;
 
-    // This runs once before all tests in this suite.
+    // This runs ONCE before all tests in this suite.
+    // We increase the timeout for this hook because it involves multiple network requests.
     beforeAll(async () => {
-        // Clear all data to ensure a clean slate
-        await User.deleteMany({});
-        await Product.deleteMany({});
-        await Variant.deleteMany({});
-        await Order.deleteMany({});
-        await Cart.deleteMany({});
+        // Clear all data to ensure a clean slate for each test run
+        const collections = [User, Product, Variant, Order, Cart];
+        for (const collection of collections) {
+            await collection.deleteMany({});
+        }
         
         // Create an Admin User and get their token
         await request(app).post('/api/auth/register').send({
@@ -35,7 +35,7 @@ describe('Order API Endpoints', () => {
             password: 'password123'
         });
         adminToken = adminLoginRes.body.token;
-        expect(adminToken).toBeDefined(); // Ensure we got a token
+        expect(adminToken).toBeDefined();
 
         // Create a Customer User and get their token
         const customerRegisterRes = await request(app).post('/api/auth/register').send({
@@ -44,7 +44,7 @@ describe('Order API Endpoints', () => {
             password: 'password123'
         });
         customerToken = customerRegisterRes.body.token;
-        expect(customerToken).toBeDefined(); // Ensure we got a token
+        expect(customerToken).toBeDefined();
 
         // Create a Product and a Variant for testing using the admin token
         const productRes = await request(app)
@@ -57,11 +57,13 @@ describe('Order API Endpoints', () => {
             .set('Authorization', `Bearer ${adminToken}`)
             .send({ sku: "ORDER-TEST-SKU", price: 50, stock: 10 });
         testVariantId = variantRes.body._id;
-    });
+    }, 30000); // <-- JEST TIMEOUT INCREASED TO 30 SECONDS FOR THIS HOOK
 
-    // afterAll is not strictly necessary with global teardown, but good practice
+    // afterAll is handled by the globalTeardown script, but it's safe to keep
+    // a cleanup here just in case the test suite is run individually.
     afterAll(async () => {
-        await mongoose.connection.close();
+        // The global teardown will close the main connection.
+        // No need to close it here.
     });
 
     let createdOrderId;
@@ -70,21 +72,21 @@ describe('Order API Endpoints', () => {
     it('should allow a customer to create an order', async () => {
         const res = await request(app)
             .post('/api/orders')
-            .set('Authorization', `Bearer ${customerToken}`) // Use the customer token
+            .set('Authorization', `Bearer ${customerToken}`)
             .send({
                 customer_name: "Order Test Customer",
                 items: [{ variantId: testVariantId, quantity: 2 }]
             });
         
-        // The console.log that helped us debug. You can remove it now.
-        console.log('Error Response Body:', res.body); 
+        // You can remove this console.log now that the test should pass
+        // console.log('Response Body:', res.body); 
 
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('_id');
         expect(res.body.total_price).toBe(100);
-        createdOrderId = res.body._id; // Save the ID for the next test
+        createdOrderId = res.body._id;
 
-        // Verify stock was decremented
+        // Verify stock was correctly decremented in the database
         const variantInDb = await Variant.findById(testVariantId);
         expect(variantInDb.stock).toBe(8);
     });
@@ -93,7 +95,7 @@ describe('Order API Endpoints', () => {
     it('should allow an admin to update the order status to shipped', async () => {
         const res = await request(app)
             .put(`/api/orders/${createdOrderId}/status`)
-            .set('Authorization', `Bearer ${adminToken}`) // Use the admin token
+            .set('Authorization', `Bearer ${adminToken}`)
             .send({ status: "shipped" });
 
         expect(res.statusCode).toEqual(200);

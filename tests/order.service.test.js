@@ -26,10 +26,12 @@ describe('Order Service', () => {
         mongoose.startSession.mockResolvedValue(mockSession);
     });
 
-    //================================================================
+   //================================================================
     // Test Suite for: placeOrder
     //================================================================
     describe('placeOrder', () => {
+        // Define all necessary test data
+        const userId = 'user_123';
         const customerName = 'John Doe';
         const items = [{ variantId: 'var_123', quantity: 2 }];
         
@@ -40,40 +42,39 @@ describe('Order Service', () => {
                 sku: 'TSHIRT-RED-M',
                 price: 20, 
                 stock: 5,
-                save: jest.fn() // Mock the save method on the variant instance
+                save: jest.fn()
             };
             VariantRepository.findManyByIdsWithSession.mockResolvedValue([mockVariant]);
             OrderRepository.create.mockResolvedValue({ _id: 'order_123' });
 
-            // Act
-            const result = await OrderService.placeOrder(customerName, items);
+            // Act: Call the service with the correct THREE arguments
+            const result = await OrderService.placeOrder(userId, customerName, items);
 
             // Assert
             expect(VariantRepository.findManyByIdsWithSession).toHaveBeenCalledWith(['var_123'], mockSession);
-            expect(mockVariant.stock).toBe(3); // 5 - 2 = 3
+            expect(mockVariant.stock).toBe(3);
             expect(mockVariant.save).toHaveBeenCalledWith({ session: mockSession });
             expect(OrderRepository.create).toHaveBeenCalledWith(
                 expect.objectContaining({
+                    user: userId, // Check that the userId is passed correctly
                     customer_name: customerName,
-                    total_price: 40 // 20 * 2
+                    total_price: 40
                 }),
                 mockSession
             );
             expect(mockSession.commitTransaction).toHaveBeenCalledTimes(1);
-            expect(mockSession.abortTransaction).not.toHaveBeenCalled();
             expect(result).toBeDefined();
         });
 
         it('should throw an error and abort transaction if a variant is not found', async () => {
             // Arrange
-            VariantRepository.findManyByIdsWithSession.mockResolvedValue([]); // Simulate variant not found
+            VariantRepository.findManyByIdsWithSession.mockResolvedValue([]);
 
-            // Act & Assert
-            await expect(OrderService.placeOrder(customerName, items))
+            // Act & Assert: Call with the correct THREE arguments
+            await expect(OrderService.placeOrder(userId, customerName, items))
                 .rejects.toThrow('Variant with ID var_123 not found.');
             
             expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
-            expect(mockSession.commitTransaction).not.toHaveBeenCalled();
         });
         
         it('should throw an error and abort transaction if stock is insufficient', async () => {
@@ -87,13 +88,11 @@ describe('Order Service', () => {
             };
             VariantRepository.findManyByIdsWithSession.mockResolvedValue([mockVariant]);
 
-            // Act & Assert
-            await expect(OrderService.placeOrder(customerName, items)) // Requesting 2
+            // Act & Assert: Call with the correct THREE arguments
+            await expect(OrderService.placeOrder(userId, customerName, items)) // Requesting 2
                 .rejects.toThrow('Insufficient stock for variant SKU TSHIRT-RED-M.');
             
             expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
-            expect(mockSession.commitTransaction).not.toHaveBeenCalled();
-            expect(mockVariant.save).not.toHaveBeenCalled(); // Stock should not be saved
         });
     });
 

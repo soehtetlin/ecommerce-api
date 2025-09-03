@@ -5,6 +5,7 @@ const OrderService = require('../services/orderService');
 // @access  Private (Authenticated users)
 exports.placeOrder = async (req, res) => {
     try {
+        console.log('User from token:', req.user); // Add this line for debugging
         const { customer_name, items } = req.body;
         const userId = req.user.id;
         if (!customer_name || !Array.isArray(items) || items.length === 0) {
@@ -78,5 +79,19 @@ exports.updateOrderStatus = async (req, res) => {
         res.status(200).json(updatedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+// @desc    Get orders for the logged-in user
+// @route   GET /api/orders/my-orders
+// @access  Private
+exports.getMyOrders = async (req, res) => {
+    try {
+        const userId = req.user.id; // Get user ID from the token
+        // We need a new service and repository method for this
+        const orders = await OrderService.getOrdersByUserId(userId);
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
