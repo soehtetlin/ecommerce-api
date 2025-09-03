@@ -245,52 +245,60 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 ## Project Structure
 
-```
+The project follows a layered architecture pattern (Controllers, Services, Repositories) to ensure a clear separation of concerns and maintainability.
+
 ecommerce-api/
 ├── config/
-│   └── db.js                # Database connection
-├── controllers/             # Request handlers
+│   └── db.js                 # Database connection logic
+├── controllers/              # Handles HTTP requests and responses
 │   ├── authController.js
 │   ├── cartController.js
 │   ├── orderController.js
 │   ├── productController.js
 │   └── variantController.js
-├── middleware/              # Authentication & validation
+├── middleware/               # Express middleware (e.g., for authentication)
 │   └── authMiddleware.js
-├── models/                  # Mongoose schemas
+├── models/                   # Mongoose schemas defining data structures
 │   ├── Cart.js
 │   ├── Order.js
 │   ├── Product.js
 │   ├── User.js
 │   └── Variant.js
-├── repositories/            # Data access layer
+├── repositories/             # Data access layer (interacts with the database)
 │   ├── cartRepository.js
 │   ├── orderRepository.js
 │   ├── productRepository.js
-│   ├── userRepository.js
+│   └── userRepository.js
 │   └── variantRepository.js
-├── routes/                  # Route definitions
+├── routes/                   # Defines the API endpoints
 │   ├── authRoutes.js
 │   ├── cartRoutes.js
 │   ├── orderRoutes.js
 │   ├── productRoutes.js
 │   └── variantRoutes.js
-├── services/                # Business logic
+├── services/                 # Contains the core business logic
 │   ├── authService.js
 │   ├── cartService.js
 │   ├── orderService.js
 │   └── productService.js
-├── tests/
-│   ├── integration/         # API integration tests
+├── tests/                    # Contains all automated tests
+│   ├── integration/
 │   │   ├── order.integration.test.js
 │   │   └── product.integration.test.js
-│   └── unit/               # Unit tests
+│   └── unit/
 │       ├── auth.service.test.js
 │       ├── cart.service.test.js
 │       ├── order.service.test.js
 │       └── product.service.test.js
-├── docker-compose.yml      # Container orchestration
-├── Dockerfile             # Application container
-├── index.js               # Application entry point
-└── package.json          # Dependencies & scripts
+├── .dockerignore             # Specifies files to ignore in the Docker build
+├── .env                      # Environment variables (local, not committed)
+├── .env.example              # Example environment file
+├── .gitignore                # Specifies files to ignore for Git
+├── docker-compose.yml        # Orchestrates the application and database containers
+├── Dockerfile                # Defines the application's Docker image
+├── index.js                  # Main application entry point
+├── mergeIntervals.js         # Solution for Part 3 Algorithm Challenge
+├── REFACTOR.md               # Analysis for Part 1 Refactoring Challenge
+├── package.json              # Project dependencies and scripts
+└── package-lock.json         # Exact dependency versions
 ```
