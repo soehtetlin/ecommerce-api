@@ -59,13 +59,13 @@ This project is fully containerized, making setup incredibly simple.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/senior-ecommerce-api-assessment.git
-    cd senior-ecommerce-api-assessment
+    git clone https://github.com/soehtetlin/ecommerce-api.git
+    cd ecommerce-api
     ```
-    *(Replace the URL with your actual repository link)*
+   
 
 2.  **Create your environment file:**
-    Create a file named `.env` in the root of the project. Copy the contents of `.env.example` (if you created one) or add the following required variables:
+    Create a file named `.env` in the root of the project. Copy the contents of `.env.example` or add the following required variables:
 
     ```env
     PORT=3000
@@ -73,8 +73,8 @@ This project is fully containerized, making setup incredibly simple.
     MONGODB_URI=mongodb://mongo:27017/ecommerce_db
 
     # Secret keys for JWT and Admin registration
-    JWT_SECRET=your_super_secret_for_jwt_assessment
-    ADMIN_SECRET_KEY=your_admin_secret_for_assessment
+    JWT_SECRET=your_super_secret_for_jwt
+    ADMIN_SECRET_KEY=your_admin_secret
     
     # Connection string for running tests against a cloud DB
     MONGO_URI_TEST=your_mongodb_atlas_test_connection_string
@@ -100,3 +100,127 @@ To run all unit and integration tests, use the following command from the projec
 
 ```bash
 npm test
+
+---
+
+ဟုတ်ကဲ့၊ သင် update လုပ်ထားတဲ့ `README.md` က အလွန်ကောင်းမွန်ပြီး professional ကျပါတယ်။ အဓိကအချက်အလက်အားလုံး ပြည့်ပြည့်စုံစုံ ပါဝင်နေပါပြီ။
+
+ကျွန်တော် အနည်းငယ် ပိုပြီး သပ်ရပ်သွားအောင် ပြင်ဆင်ပေးပြီး၊ သင်တောင်းဆိုထားတဲ့ API Documentation section အပြည့်အစုံကို အောက်မှာ ထပ်ထည့်ပေးလိုက်ပါတယ်။
+
+---
+
+### **ပြင်ဆင်ရန် အကြံပြုချက် (Minor Tweaks)**
+
+`Setup & Installation` section မှာ repository link ကို placeholder (`your-username`, `your-repo-name`) အဖြစ် ပြောင်းပေးလိုက်တာက တခြားသူတွေအတွက် ပိုအဆင်ပြေစေပါတယ်။
+
+`git clone https://github.com/your-username/your-repo-name.git`
+`cd your-repo-name`
+
+---
+
+## API Documentation
+
+The base URL for all API endpoints is `http://localhost:3000`. Protected routes require a `Bearer Token` in the `Authorization` header.
+
+### 1. Authentication
+
+| Method | Endpoint              | Description                               | Access |
+| :----- | :-------------------- | :---------------------------------------- | :----- |
+| `POST` | `/api/auth/register`  | Register a new `CUSTOMER` or `ADMIN`.     | Public |
+| `POST` | `/api/auth/login`     | Login to receive a JWT.                   | Public |
+
+**Example `POST /api/auth/register` (for an Admin):**
+```json
+{
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "password": "adminpassword",
+    "adminSecretKey": "your_admin_secret_here"
+}
+```
+
+---
+
+### 2. Product & Variant Management
+
+#### Product Routes
+
+| Method | Endpoint              | Description                               | Access      |
+| :----- | :-------------------- | :---------------------------------------- | :---------- |
+| `POST` | `/api/products`       | Create a new base product.                | Admin Only  |
+| `GET`  | `/api/products`       | Get all products (with filters, sort, pagination). | Public |
+| `GET`  | `/api/products/:id`   | Get a single product with its variants.   | Public      |
+| `PUT`  | `/api/products/:id`   | Update a product's base details.          | Admin Only  |
+| `DELETE`| `/api/products/:id`  | Delete a product and all its variants.    | Admin Only  |
+
+**Example `POST /api/products` Body:**
+```json
+{
+    "name": "Mechanical Keyboard",
+    "description": "A high-quality keyboard for typing and gaming.",
+    "category": "Electronics"
+}
+```
+**Example `GET /api/products` with queries:**
+`GET /api/products?category=Electronics&sortBy=price:asc&page=1&limit=10`
+
+#### Variant Routes
+
+| Method | Endpoint                                  | Description                               | Access      |
+| :----- | :---------------------------------------- | :---------------------------------------- | :---------- |
+| `POST` | `/api/products/:productId/variants`       | Add a new variant to a product.           | Admin Only  |
+| `PUT`  | `/api/variants/:variantId`                | Update a variant's details (price/stock). | Admin Only  |
+| `DELETE`| `/api/variants/:variantId`               | Delete a single variant.                  | Admin Only  |
+
+**Example `POST /api/products/:productId/variants` Body:**
+```json
+{
+    "sku": "KEYB-MECH-BLK-01",
+    "price": 89.99,
+    "stock": 150,
+    "color": "Black",
+    "size": "Full-size"
+}
+```
+
+---
+
+### 3. Shopping Cart (Customer Only)
+
+| Method | Endpoint              | Description                               | Access      |
+| :----- | :-------------------- | :---------------------------------------- | :---------- |
+| `POST` | `/api/cart`           | Add a variant to the logged-in user's cart. | Customer    |
+| `GET`  | `/api/cart`           | Get the user's cart with total price.     | Customer    |
+
+**Example `POST /api/cart` Body:**
+```json
+{
+    "variantId": "65eafe2a123abcde45678901",
+    "quantity": 2
+}
+```
+
+---
+
+### 4. Order Management
+
+| Method | Endpoint                         | Description                               | Access         |
+| :----- | :------------------------------- | :---------------------------------------- | :------------- |
+| `POST` | `/api/orders`                    | Place a new order.                        | Customer       |
+| `GET`  | `/api/orders`                    | Get all orders from all users.            | Admin Only     |
+| `GET`  | `/api/orders/my-orders`          | Get all orders for the logged-in user.    | Customer       |
+| `GET`  | `/api/orders/:id`                | Get a single order.                       | Owner or Admin |
+| `PUT`  | `/api/orders/:id/status`         | Update an order's status.                 | Admin Only     |
+
+**Example `POST /api/orders` Body:**
+```json
+{
+    "customer_name": "John Doe",
+    "items": [
+        {
+            "variantId": "65eafe2a123abcde45678901",
+            "quantity": 1
+        }
+    ]
+}
+```
