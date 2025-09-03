@@ -1,11 +1,11 @@
 // tests/order.integration.test.js
 const request = require('supertest');
-const app = require('../index');
-const User = require('../models/User');
-const Product = require('../models/Product');
-const Variant = require('../models/Variant');
-const Order = require('../models/Order');
-const Cart = require('../models/Cart');
+const app = require('../../index');
+const User = require('../../models/User');
+const Product = require('../../models/Product');
+const Variant = require('../../models/Variant');
+const Order = require('../../models/Order');
+const Cart = require('../../models/Cart');
 
 process.env.NODE_ENV = 'test';
 

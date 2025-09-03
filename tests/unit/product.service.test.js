@@ -1,10 +1,10 @@
-const ProductService = require('../services/productService');
-const ProductRepository = require('../repositories/productRepository');
-const VariantRepository = require('../repositories/variantRepository');
+const ProductService = require('../../services/productService');
+const ProductRepository = require('../../repositories/productRepository');
+const VariantRepository = require('../../repositories/variantRepository');
 
 // Mock the entire repository layer
-jest.mock('../repositories/productRepository');
-jest.mock('../repositories/variantRepository');
+jest.mock('../../repositories/productRepository');
+jest.mock('../../repositories/variantRepository');
 
 describe('Product Service', () => {
 

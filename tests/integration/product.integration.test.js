@@ -1,8 +1,8 @@
 const request = require('supertest');
-const app = require('../index');
-const Product = require('../models/Product');
-const Variant = require('../models/Variant');
-const User = require('../models/User');
+const app = require('../../index');
+const Product = require('../../models/Product');
+const Variant = require('../../models/Variant');
+const User = require('../../models/User');
 
 process.env.NODE_ENV = 'test';
 

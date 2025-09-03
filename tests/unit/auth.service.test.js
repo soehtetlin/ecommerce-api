@@ -1,10 +1,10 @@
-const AuthService = require('../services/authService');
-const UserRepository = require('../repositories/userRepository');
+const AuthService = require('../../services/authService');
+const UserRepository = require('../../repositories/userRepository');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Mock the entire repository layer and other dependencies
-jest.mock('../repositories/userRepository');
+jest.mock('../../repositories/userRepository');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 

@@ -1,8 +1,8 @@
-const CartService = require('../services/cartService');
-const CartRepository = require('../repositories/cartRepository');
+const CartService = require('../../services/cartService');
+const CartRepository = require('../../repositories/cartRepository');
 
 // Mock the entire repository layer
-jest.mock('../repositories/cartRepository');
+jest.mock('../../repositories/cartRepository');
 
 describe('Cart Service', () => {
 

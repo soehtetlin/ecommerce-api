@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
-const OrderService = require('../services/orderService');
-const OrderRepository = require('../repositories/orderRepository');
-const VariantRepository = require('../repositories/variantRepository');
+const OrderService = require('../../services/orderService');
+const OrderRepository = require('../../repositories/orderRepository');
+const VariantRepository = require('../../repositories/variantRepository');
 
 // Mock the entire repository layer and mongoose
-jest.mock('../repositories/orderRepository');
-jest.mock('../repositories/variantRepository');
+jest.mock('../../repositories/orderRepository');
+jest.mock('../../repositories/variantRepository');
 jest.mock('mongoose');
 
 describe('Order Service', () => {

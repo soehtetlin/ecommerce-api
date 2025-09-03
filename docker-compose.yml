@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # The service for our Node.js application
   app:
@@ -13,10 +11,11 @@ services:
       - .env 
     # Set the environment variables required by the application
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ecommerce_db
+      - MONGODB_URI=mongodb://mongo:27017/ecommerce_db?replicaSet=rs0
     # Make this service wait for the 'mongo' service to be ready before starting
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     # Set a restart policy
     restart: unless-stopped
 
@@ -31,6 +30,15 @@ services:
     volumes:
       - mongo-data:/data/db
     restart: unless-stopped
+    # Add replica set configuration
+    command: --replSet rs0 --bind_ip_all
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
 
 # Define the named volume that 'mongo' service uses for data persistence
 volumes:
