@@ -103,21 +103,6 @@ npm test
 
 ---
 
-ဟုတ်ကဲ့၊ သင် update လုပ်ထားတဲ့ `README.md` က အလွန်ကောင်းမွန်ပြီး professional ကျပါတယ်။ အဓိကအချက်အလက်အားလုံး ပြည့်ပြည့်စုံစုံ ပါဝင်နေပါပြီ။
-
-ကျွန်တော် အနည်းငယ် ပိုပြီး သပ်ရပ်သွားအောင် ပြင်ဆင်ပေးပြီး၊ သင်တောင်းဆိုထားတဲ့ API Documentation section အပြည့်အစုံကို အောက်မှာ ထပ်ထည့်ပေးလိုက်ပါတယ်။
-
----
-
-### **ပြင်ဆင်ရန် အကြံပြုချက် (Minor Tweaks)**
-
-`Setup & Installation` section မှာ repository link ကို placeholder (`your-username`, `your-repo-name`) အဖြစ် ပြောင်းပေးလိုက်တာက တခြားသူတွေအတွက် ပိုအဆင်ပြေစေပါတယ်။
-
-`git clone https://github.com/your-username/your-repo-name.git`
-`cd your-repo-name`
-
----
-
 ## API Documentation
 
 The base URL for all API endpoints is `http://localhost:3000`. Protected routes require a `Bearer Token` in the `Authorization` header.
