@@ -100,6 +100,7 @@ To run all unit and integration tests, use the following command from the projec
 
 ```bash
 npm test
+```
 
 ---
 
