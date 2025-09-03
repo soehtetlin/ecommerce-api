@@ -69,24 +69,38 @@ This project is fully containerized, making setup incredibly simple.
 
     ```env
     PORT=3000
-    # This will be used by the Docker container for the app
-    MONGODB_URI=mongodb://mongo:27017/ecommerce_db
-
-    # Secret keys for JWT and Admin registration
-    JWT_SECRET=your_super_secret_for_jwt
-    ADMIN_SECRET_KEY=your_admin_secret
-    
-    # Connection string for running tests against a cloud DB
-    MONGO_URI_TEST=your_mongodb_atlas_test_connection_string
+    MONGODB_URI=mongodb://mongo:27017/ecommerce_db?replicaSet=rs0
+    MONGO_ATLAS_URI=
+    MONGO_URI_TEST=
+    JWT_SECRET=
+    ADMIN_SECRET_KEY=
     ```
 
 3.  **Run the application with Docker Compose:**
-    This single command will build the Node.js image, pull the MongoDB image, and start both containers.
+    This single command will build the Node.js image, pull the MongoDB image with replica set configuration, and start both containers.
 
     ```bash
     docker-compose up --build
     ```
-    The API will be available at `http://localhost:3000`.
+    
+    **Note:** The MongoDB replica set initialization may take 30-60 seconds. Wait for the logs to show "waiting for connections" before making API requests that require transactions.
+
+    4.  **Verify the setup:**
+    The API will be available at `http://localhost:3000`. You can test it with:
+    ```bash
+    curl http://localhost:3000/api/products
+    ```
+---
+
+## MongoDB Transactions Setup
+
+This project uses MongoDB transactions for order processing. The Docker setup automatically configures a single-node replica set (`rs0`) which is required for transactions to work.
+
+**Important Notes:**
+- MongoDB transactions only work with replica sets
+- The Docker configuration automatically initializes the replica set
+- If you encounter transaction errors, ensure the replica set is properly initialized by checking the MongoDB container logs
+
 
 ---
 
@@ -96,17 +110,34 @@ The project includes a comprehensive suite of tests.
 
 ### How to Run Tests
 
-To run all unit and integration tests, use the following command from the project's root directory:
-
+**Option 1: Using npm (requires Node.js locally):**
 ```bash
+npm install
 npm test
 ```
+
+**Option 2: Using Docker:**
+```bash
+docker-compose exec app npm test
+```
+### Test Coverage
+
+- **Unit Tests:** Service layer business logic
+- **Integration Tests:** API endpoints with database interactions
+- **Authentication Tests:** JWT and role-based access control
+- **Transaction Tests:** Order creation with inventory management
 
 ---
 
 ## API Documentation
 
 The base URL for all API endpoints is `http://localhost:3000`. Protected routes require a `Bearer Token` in the `Authorization` header.
+
+### Authentication Headers
+For protected routes, include:
+```
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+```
 
 ### 1. Authentication
 
@@ -209,4 +240,57 @@ The base URL for all API endpoints is `http://localhost:3000`. Protected routes 
         }
     ]
 }
+```
+---
+
+## Project Structure
+
+```
+ecommerce-api/
+├── config/
+│   └── db.js                # Database connection
+├── controllers/             # Request handlers
+│   ├── authController.js
+│   ├── cartController.js
+│   ├── orderController.js
+│   ├── productController.js
+│   └── variantController.js
+├── middleware/              # Authentication & validation
+│   └── authMiddleware.js
+├── models/                  # Mongoose schemas
+│   ├── Cart.js
+│   ├── Order.js
+│   ├── Product.js
+│   ├── User.js
+│   └── Variant.js
+├── repositories/            # Data access layer
+│   ├── cartRepository.js
+│   ├── orderRepository.js
+│   ├── productRepository.js
+│   ├── userRepository.js
+│   └── variantRepository.js
+├── routes/                  # Route definitions
+│   ├── authRoutes.js
+│   ├── cartRoutes.js
+│   ├── orderRoutes.js
+│   ├── productRoutes.js
+│   └── variantRoutes.js
+├── services/                # Business logic
+│   ├── authService.js
+│   ├── cartService.js
+│   ├── orderService.js
+│   └── productService.js
+├── tests/
+│   ├── integration/         # API integration tests
+│   │   ├── order.integration.test.js
+│   │   └── product.integration.test.js
+│   └── unit/               # Unit tests
+│       ├── auth.service.test.js
+│       ├── cart.service.test.js
+│       ├── order.service.test.js
+│       └── product.service.test.js
+├── docker-compose.yml      # Container orchestration
+├── Dockerfile             # Application container
+├── index.js               # Application entry point
+└── package.json          # Dependencies & scripts
 ```
