@@ -5,7 +5,6 @@ const OrderService = require('../services/orderService');
 // @access  Private (Authenticated users)
 exports.placeOrder = async (req, res) => {
     try {
-        console.log('User from token:', req.user); // Add this line for debugging
         const { customer_name, items } = req.body;
         const userId = req.user.id;
         if (!customer_name || !Array.isArray(items) || items.length === 0) {
