@@ -247,6 +247,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 The project follows a layered architecture pattern (Controllers, Services, Repositories) to ensure a clear separation of concerns and maintainability.
 
+```
 ecommerce-api/
 ├── config/
 │   └── db.js                 # Database connection logic
