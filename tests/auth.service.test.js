@@ -12,7 +12,7 @@ describe('Auth Service', () => {
 
     // Set up environment variables for the test suite
     process.env.JWT_SECRET = 'a_random_secret_for_testing';
-    
+
     // Clear all mocks before each test to ensure test isolation
     beforeEach(() => {
         jest.clearAllMocks();
@@ -22,7 +22,7 @@ describe('Auth Service', () => {
     // Test Suite for: registerUser
     //================================================================
     describe('registerUser', () => {
-        
+
         it('should create a new CUSTOMER user and return a token successfully', async () => {
             // Arrange
             const userData = { name: 'Test User', email: 'test@example.com', password: 'password123' };
@@ -57,11 +57,11 @@ describe('Auth Service', () => {
             process.env.ADMIN_SECRET_KEY = 'MySuperSecretAdminKey123'; // Set up the env variable for the test
             const hashedPassword = 'hashedPassword123';
             const createdUser = { _id: 'admin_123', role: 'ADMIN', ...userData };
-            
+
             UserRepository.findByEmail.mockResolvedValue(null);
             bcrypt.hash.mockResolvedValue(hashedPassword);
             UserRepository.create.mockResolvedValue(createdUser);
-            
+
             // Act
             await AuthService.registerUser(userData);
 
@@ -136,7 +136,7 @@ describe('Auth Service', () => {
             await expect(AuthService.loginUser(email, password))
                 .rejects.toHaveProperty('statusCode', 400);
         });
-        
+
         it('should throw a 400 error if the password is incorrect', async () => {
             // Arrange
             UserRepository.findByEmail.mockResolvedValue(userInDb);

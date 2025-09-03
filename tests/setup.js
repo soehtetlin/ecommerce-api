@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('dotenv').config({ path: '.env' }); // Make sure env variables are loaded
+require('dotenv').config({ path: '.env' });
 
 module.exports = async () => {
     process.env.NODE_ENV = 'test';

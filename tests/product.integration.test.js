@@ -1,7 +1,6 @@
-// tests/product.integration.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../index'); // Import your Express app
+const app = require('../index');
 const Product = require('../models/Product');
 const Variant = require('../models/Variant');
 const User = require('../models/User');
@@ -14,15 +13,12 @@ describe('Product & Variant API Endpoints', () => {
 
     // Before all tests, connect to the test DB and get an admin token
     beforeAll(async () => {
-        // NOTE: Make sure your test database is connected. 
-        // Your main app file should handle the connection.
-
         // Register and login an admin user to get a token for protected routes
         await request(app).post('/api/auth/register').send({
             name: 'Test Admin',
             email: 'admin.test@example.com',
             password: 'password123',
-            adminSecretKey: process.env.ADMIN_SECRET_KEY || 'your_admin_secret_for_assessment'
+            adminSecretKey: process.env.ADMIN_SECRET_KEY
         });
         const res = await request(app).post('/api/auth/login').send({
             email: 'admin.test@example.com',
@@ -35,12 +31,12 @@ describe('Product & Variant API Endpoints', () => {
     afterAll(async () => {
         await Product.deleteMany({});
         await Variant.deleteMany({});
-        await User.deleteMany({});        
+        await User.deleteMany({});
     });
 
     // Test the entire CRUD flow for a product and its variant
     let createdProductId;
-    
+
     it('should create a new product when authenticated as an admin', async () => {
         const res = await request(app)
             .post('/api/products')
@@ -50,7 +46,7 @@ describe('Product & Variant API Endpoints', () => {
                 description: "A cool keyboard",
                 category: "Electronics"
             });
-        
+
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('_id');
         expect(res.body.name).toBe("Integration Test Keyboard");
@@ -67,7 +63,7 @@ describe('Product & Variant API Endpoints', () => {
                 stock: 50,
                 color: "Black"
             });
-        
+
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('sku', 'IT-KB-01');
 
@@ -79,7 +75,7 @@ describe('Product & Variant API Endpoints', () => {
 
     it('should get a list of all products (publicly accessible)', async () => {
         const res = await request(app).get('/api/products');
-        
+
         expect(res.statusCode).toEqual(200);
         expect(Array.isArray(res.body)).toBe(true);
         expect(res.body.length).toBeGreaterThan(0);
@@ -98,6 +94,6 @@ describe('Product & Variant API Endpoints', () => {
                 category: "Test"
             });
 
-        expect(res.statusCode).toEqual(401); // Or 403 depending on your middleware order
+        expect(res.statusCode).toEqual(401);
     });
 });

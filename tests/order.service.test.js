@@ -26,7 +26,7 @@ describe('Order Service', () => {
         mongoose.startSession.mockResolvedValue(mockSession);
     });
 
-   //================================================================
+    //================================================================
     // Test Suite for: placeOrder
     //================================================================
     describe('placeOrder', () => {
@@ -34,13 +34,13 @@ describe('Order Service', () => {
         const userId = 'user_123';
         const customerName = 'John Doe';
         const items = [{ variantId: 'var_123', quantity: 2 }];
-        
+
         it('should place an order successfully if stock is sufficient', async () => {
             // Arrange
-            const mockVariant = { 
-                _id: 'var_123', 
+            const mockVariant = {
+                _id: 'var_123',
                 sku: 'TSHIRT-RED-M',
-                price: 20, 
+                price: 20,
                 stock: 5,
                 save: jest.fn()
             };
@@ -73,16 +73,16 @@ describe('Order Service', () => {
             // Act & Assert: Call with the correct THREE arguments
             await expect(OrderService.placeOrder(userId, customerName, items))
                 .rejects.toThrow('Variant with ID var_123 not found.');
-            
+
             expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
         });
-        
+
         it('should throw an error and abort transaction if stock is insufficient', async () => {
             // Arrange
-            const mockVariant = { 
-                _id: 'var_123', 
+            const mockVariant = {
+                _id: 'var_123',
                 sku: 'TSHIRT-RED-M',
-                price: 20, 
+                price: 20,
                 stock: 1, // Stock is only 1
                 save: jest.fn()
             };
@@ -91,7 +91,7 @@ describe('Order Service', () => {
             // Act & Assert: Call with the correct THREE arguments
             await expect(OrderService.placeOrder(userId, customerName, items)) // Requesting 2
                 .rejects.toThrow('Insufficient stock for variant SKU TSHIRT-RED-M.');
-            
+
             expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
         });
     });
@@ -146,7 +146,7 @@ describe('Order Service', () => {
             expect(VariantRepository.updateStock).toHaveBeenCalledTimes(2);
             expect(VariantRepository.updateStock).toHaveBeenCalledWith('var_123', 2, mockSession);
             expect(VariantRepository.updateStock).toHaveBeenCalledWith('var_456', 1, mockSession);
-            
+
             expect(mockSession.commitTransaction).toHaveBeenCalledTimes(1);
         });
 
@@ -157,7 +157,7 @@ describe('Order Service', () => {
             // Act & Assert
             await expect(OrderService.updateOrderStatus(orderId, 'completed'))
                 .rejects.toThrow('Order not found');
-            
+
             expect(mockSession.abortTransaction).toHaveBeenCalledTimes(1);
         });
     });

@@ -19,7 +19,7 @@ describe('Product Service', () => {
     describe('createProduct', () => {
         it('should call ProductRepository.create with correct data', async () => {
             const productData = { name: 'New Keyboard', description: 'Mechanical keyboard', category: 'Electronics' };
-            
+
             // Arrange: Mock the repository's create function
             ProductRepository.create.mockResolvedValue({ _id: '123', ...productData });
 
@@ -98,7 +98,7 @@ describe('Product Service', () => {
             );
         });
     });
-    
+
     //================================================================
     // Test Suite for: deleteProduct
     //================================================================
@@ -117,9 +117,6 @@ describe('Product Service', () => {
             // Check the order of operations
             expect(VariantRepository.deleteByProductId).toHaveBeenCalledWith(productId);
             expect(ProductRepository.deleteById).toHaveBeenCalledWith(productId);
-            
-            // Ensure deleteById is called after deleteByProductId completes
-            // This is implicitly tested by the async/await flow
         });
     });
 });

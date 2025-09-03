@@ -1,4 +1,3 @@
-// tests/cart.service.test.js
 const CartService = require('../services/cartService');
 const CartRepository = require('../repositories/cartRepository');
 
@@ -19,7 +18,7 @@ describe('Cart Service', () => {
     // Test Suite for: getCart
     //================================================================
     describe('getCart', () => {
-        
+
         it('should return an existing cart with a calculated total price', async () => {
             // Arrange
             const mockCart = {
@@ -30,7 +29,7 @@ describe('Cart Service', () => {
                 ]
             };
             CartRepository.findByUserId.mockResolvedValue(mockCart);
-            
+
             // Act
             const { cart, totalPrice } = await CartService.getCart(userId);
 
@@ -74,13 +73,13 @@ describe('Cart Service', () => {
                 user: userId,
                 items: [{ variant: { _id: variantId, price: 25 }, quantity: 2 }]
             };
-            
+
             // First findByUserId call returns the initial cart
             CartRepository.findByUserId.mockResolvedValueOnce(initialCart);
             // The second findByUserId call (from within the final getCart) returns the final cart
             CartRepository.findByUserId.mockResolvedValueOnce(finalCart);
             CartRepository.save.mockResolvedValue({});
-            
+
             // Act
             const { cart, totalPrice } = await CartService.addItemToCart(userId, variantId, 2);
 
