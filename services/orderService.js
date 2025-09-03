@@ -11,7 +11,7 @@ class OrderService {
      * @param {Array<object>} items - Array of items with variantId and quantity.
      * @returns {Promise<Document>} The newly created order.
      */
-    async placeOrder(customerName, items) {
+    async placeOrder(userId, customerName, items) {
         const session = await mongoose.startSession();
         session.startTransaction();
 
@@ -45,6 +45,7 @@ class OrderService {
             await Promise.all(variantsInDB.map(v => v.save({ session })));
 
             const newOrderData = {
+                user: userId, 
                 customer_name: customerName,
                 items: orderItemsWithDetails,
                 total_price: calculatedTotalPrice,

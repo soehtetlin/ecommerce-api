@@ -6,10 +6,11 @@ const OrderService = require('../services/orderService');
 exports.placeOrder = async (req, res) => {
     try {
         const { customer_name, items } = req.body;
+        const userId = req.user.id;
         if (!customer_name || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: 'Customer name and items are required.' });
         }
-        const savedOrder = await OrderService.placeOrder(customer_name, items);
+        const savedOrder = await OrderService.placeOrder(userId, customer_name, items);
         res.status(201).json(savedOrder);
     } catch (error) {
         // Errors from the service layer will be caught here

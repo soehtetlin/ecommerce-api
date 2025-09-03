@@ -29,8 +29,12 @@ app.use('/api/auth', authRoutes); // All /api/auth requests go to authRoutes
 app.use('/api', variantRoutes); // All /api requests go to variantRoutes
 app.use('/api/cart', cartRoutes); // All /api/cart requests go to cartRoutes
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Access API at http://localhost:${PORT}`);
-});
+// Start the server only if this file is run directly (not when imported for tests)
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+// Export the app for testing purposes
+module.exports = app;

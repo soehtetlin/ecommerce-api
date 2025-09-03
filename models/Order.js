@@ -1,65 +1,54 @@
 const mongoose = require('mongoose');
 
-// This defines the schema for the items within an order.
-// It is a sub-schema that will be embedded in the main Order schema.
 const orderItemSchema = new mongoose.Schema({
-  product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product', // References the 'Product' model
-    required: true
-  },
-  name: { // Stores the product name at the time of the order
-    type: String,
-    required: true
-  },
-  price_at_order: { // Stores the product price at the time of the order
-    type: Number,
-    required: true,
-    min: 0
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1 // Quantity must be at least 1
-  }
-}, { _id: false }); // We set _id to false because this is a sub-document
+    variantId: { // Ensure this is variantId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Variant', // Ensure this refers to 'Variant'
+        required: true
+    },
+    name: { // Stores a snapshot of the name (e.g., SKU)
+        type: String,
+        required: true
+    },
+    price_at_order: { // Stores a snapshot of the price
+        type: Number,
+        required: true,
+        min: 0
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
+    }
+}, { _id: false });
 
-// This is the main schema for the Order document.
 const orderSchema = new mongoose.Schema({
-  customer_name: {
-    type: String,
-    required: true,
-    trim: true // Removes whitespace from both ends of the string
-  },
-  items: [orderItemSchema], // An array of order items, using the sub-schema defined above
-  total_price: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: ['pending', 'completed', 'cancelled'], // The status must be one of these values
-    default: 'pending' // The default status when an order is created
-  }
+    user: { // Add the user who placed the order
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    customer_name: { // You can keep this for display purposes
+        type: String,
+        required: true,
+        trim: true
+    },
+    items: [orderItemSchema],
+    total_price: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending', 'completed', 'shipped', 'cancelled'],
+        default: 'pending'
+    }
 }, {
-  // Automatically adds createdAt and updatedAt fields to the document
-  timestamps: true 
+    timestamps: true 
 });
 
-// A pre-save middleware (hook) to automatically calculate the total_price
-// before the order document is saved to the database.
-orderSchema.pre('save', function(next) {
-  // 'this' refers to the document being saved
-  this.total_price = this.items.reduce((accumulator, currentItem) => {
-    return accumulator + (currentItem.price_at_order * currentItem.quantity);
-  }, 0);
-  next(); // Move on to the next middleware or save operation
-});
+// We removed the pre-save hook for total_price because it's calculated in the service layer now.
 
-// Create the Order model from the schema
-const Order = mongoose.model('Order', orderSchema);
-
-// Export the model to be used in other parts of the application
-module.exports = Order;
+module.exports = mongoose.model('Order', orderSchema);

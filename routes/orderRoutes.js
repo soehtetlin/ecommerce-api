@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
+const { protect } = require('../middleware/authMiddleware');
 
 // Define Order API routes
 // POST to place a new order
@@ -17,5 +18,7 @@ router.get('/customer/:customerName', orderController.getOrdersByCustomer);
 
 // PUT (update) order status by ID
 router.put('/:id/status', orderController.updateOrderStatus);
+
+router.post('/', protect, orderController.placeOrder);
 
 module.exports = router;
