@@ -85,7 +85,7 @@ This project is fully containerized, making setup incredibly simple.
     
     **Note:** The MongoDB replica set initialization may take 30-60 seconds. Wait for the logs to show "waiting for connections" before making API requests that require transactions.
 
-    4.  **Verify the setup:**
+4.  **Verify the setup:**
     The API will be available at `http://localhost:3000`. You can test it with:
     ```bash
     curl http://localhost:3000/api/products
